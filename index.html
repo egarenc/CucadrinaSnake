@@ -3,46 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Web Game</title>
+    <title>CucadrinasSnake Web Game</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
     <div id="pantalla-bienvenida" class="escena activa">
-        <h1>🐍 Classic Snake</h1>
+        <h1>🐍 CucadrinasSnake Web Game</h1>
         <button id="btn-continuar">CONTINUAR</button>
         <button id="btn-feedback">FEEDBACK</button>
     </div>
 
     <div id="pantalla-opciones" class="escena">
-        <h2>Opciones de Partida</h2>
+        <h2>CONFIGURACIÓ DE PARTIDA</h2>
         
         <div class="control-group">
-            <label for="toggle-sonido">Sonido:</label>
+            <label for="toggle-sonido">SO:</label>
             <select id="toggle-sonido">
-                <option value="activo">Activo</option>
-                <option value="mute">Mute</option>
+                <option value="activo">ACTIU</option>
+                <option value="mute">DESACTIVAT</option>
             </select>
         </div>
         
         <div class="control-group">
-            <label for="slider-dureza">Dureza (Velocidad):</label>
+            <label for="slider-dureza">DIFICULTAT:</label>
             <input type="range" id="slider-dureza" min="1" max="10" value="5">
         </div>
         
         <button id="btn-iniciar">INICIAR PARTIDA</button>
-        <button id="btn-volver-opciones">VOLVER</button>
+        <button id="btn-volver-opciones">TORNAR</button>
     </div>
 
     <div id="pantalla-juego" class="escena">
         <div id="marcador">
-            <span>Nivel: <span id="ui-nivel">1</span>/10</span>
-            <span>Puntuación: <span id="ui-puntos">0</span></span>
+            <span>Nivell: <span id="ui-nivel">1</span>/10</span>
+            <span>Puntuació: <span id="ui-puntos">0</span></span>
         </div>
         
-        <canvas id="game-canvas" width="400" height="400"></canvas>
+        <canvas id="game-canvas" width="600" height="600"></canvas>
         
-        <button id="btn-salir" class="btn-peligro">SALIR</button>
+        <button id="btn-salir" class="btn-peligro">SORTIR</button>
     </div>
 
     <script src="game.js"></script>

@@ -3,12 +3,16 @@
 // ==========================================
 const RUTA_CABEZA = 'cabeza.jpg';
 const RUTA_CUERPO = 'cuerpo.jpg';
+const RUTA_FONDO = 'solar.jpg';
 
 const imgCabeza = new Image();
 imgCabeza.src = RUTA_CABEZA;
 
 const imgCuerpo = new Image();
 imgCuerpo.src = RUTA_CUERPO;
+
+const imgFondo = new Image();
+imgFondo.src = RUTA_FONDO;
 
 // ==========================================
 // 2. REFERENCIAS AL DOM
@@ -189,8 +193,15 @@ function finDelJuego() {
 
 function dibujar() {
     // Limpiar pantalla
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    //ctx.fillStyle = '#000';
+    //ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Dibujar fondo (Imagen o fallback negro si no carga)
+    if (imgFondo.complete && imgFondo.naturalWidth !== 0) {
+        ctx.drawImage(imgFondo, 0, 0, canvas.width, canvas.height);
+    } else {
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
 
     // Dibujar comida (roja)
     ctx.fillStyle = '#ff3333';

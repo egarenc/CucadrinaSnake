@@ -84,7 +84,7 @@ canvas {
 #marcador {
     display: flex;
     justify-content: space-between;
-    width: 400px;
+    width: 600px;
     font-size: 18px;
     font-weight: bold;
     color: #4CAF50;
