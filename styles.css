@@ -1,0 +1,91 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #1a1a1a;
+    color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    text-align: center;
+}
+
+/* Gestión de Escenas */
+.escena {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    background-color: #2a2a2a;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.6);
+    min-width: 300px;
+}
+
+.escena.activa {
+    display: flex;
+}
+
+/* Tipografía y Controles */
+h1 {
+    color: #4CAF50;
+    margin-bottom: 30px;
+}
+
+button {
+    padding: 12px 24px;
+    margin: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    width: 80%;
+    transition: background-color 0.2s;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+button.btn-peligro {
+    background-color: #d32f2f;
+    margin-top: 20px;
+}
+
+button.btn-peligro:hover {
+    background-color: #b71c1c;
+}
+
+.control-group {
+    margin: 15px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.control-group label {
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+/* Canvas del juego */
+canvas {
+    background-color: #000;
+    border: 3px solid #4CAF50;
+    border-radius: 4px;
+    margin-top: 15px;
+    box-shadow: inset 0 0 10px rgba(76, 175, 80, 0.2);
+}
+
+#marcador {
+    display: flex;
+    justify-content: space-between;
+    width: 400px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #4CAF50;
+}

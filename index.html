@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Web Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div id="pantalla-bienvenida" class="escena activa">
+        <h1>🐍 Classic Snake</h1>
+        <button id="btn-continuar">CONTINUAR</button>
+        <button id="btn-feedback">FEEDBACK</button>
+    </div>
+
+    <div id="pantalla-opciones" class="escena">
+        <h2>Opciones de Partida</h2>
+        
+        <div class="control-group">
+            <label for="toggle-sonido">Sonido:</label>
+            <select id="toggle-sonido">
+                <option value="activo">Activo</option>
+                <option value="mute">Mute</option>
+            </select>
+        </div>
+        
+        <div class="control-group">
+            <label for="slider-dureza">Dureza (Velocidad):</label>
+            <input type="range" id="slider-dureza" min="1" max="10" value="5">
+        </div>
+        
+        <button id="btn-iniciar">INICIAR PARTIDA</button>
+        <button id="btn-volver-opciones">VOLVER</button>
+    </div>
+
+    <div id="pantalla-juego" class="escena">
+        <div id="marcador">
+            <span>Nivel: <span id="ui-nivel">1</span>/10</span>
+            <span>Puntuación: <span id="ui-puntos">0</span></span>
+        </div>
+        
+        <canvas id="game-canvas" width="400" height="400"></canvas>
+        
+        <button id="btn-salir" class="btn-peligro">SALIR</button>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
