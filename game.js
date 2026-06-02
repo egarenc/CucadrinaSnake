@@ -99,7 +99,7 @@ btnRanking.addEventListener('click', () => {
     modalBtnCerrar.disabled = true;
     modalBtnCerrar.innerText = "Espera...";
 
-    const urlAPI = 'https://script.google.com/macros/s/AKfycbwbtyD0_pFAITj6cqS7VmcdLwvjMAHSbPT4t43LiGKrzvuC5jfVoJ4TD_X_X4gtQPWT/exec?action=getRankings';
+    const urlAPI = 'https://script.google.com/macros/s/AKfycbwSFXr3ouG1f90jZJ9K3FBMVrtoRxpUfM4qDSoy8Tx8Tnsiy09GEvM-nbUqrNjRqyEsng/exec?action=getRankings';
 
     fetch(urlAPI)
     .then(response => response.json())
@@ -322,7 +322,7 @@ function finDelJuego() {
                 dificultad: parseInt(sliderDureza.value)
             };
 
-            const urlAPI = 'https://script.google.com/macros/s/AKfycbxAlIJ5a_jWJCKiHCYbEQX8BM9WA3DCWXIHAKs6NCKy8ExbVBlmFNUPAVIOvzYmJuXd/exec';
+            const urlAPI = 'https://script.google.com/macros/s/AKfycbwSFXr3ouG1f90jZJ9K3FBMVrtoRxpUfM4qDSoy8Tx8Tnsiy09GEvM-nbUqrNjRqyEsng/exec';
 
             // Petición HTTP POST a Google Apps Script
             fetch(urlAPI, {
