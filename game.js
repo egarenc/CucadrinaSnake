@@ -33,6 +33,10 @@ const uiCaptures = document.getElementById('ui-captures');
 const uiTiempo = document.getElementById('ui-tiempo'); // Nueva referencia para el tiempo
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
+const customModal = document.getElementById('custom-modal');
+const modalMensaje = document.getElementById('modal-mensaje');
+const modalBtnCerrar = document.getElementById('modal-btn-cerrar');
+let accionAlCerrarModal = null; // Guardará qué hacer cuando el usuario pulse OK
 
 // ==========================================
 // 3. VARIABLES DE ESTADO DEL JUEGO
@@ -50,6 +54,26 @@ let bucleCronometro;          // Intervalo del reloj
 // ==========================================
 // 4. NAVEGACIÓN ENTRE ESCENAS
 // ==========================================
+// Función que reemplaza al alert() nativo
+function mostrarAlertaPersonalizada(mensaje, callback = null) {
+    if (!customModal || !modalMensaje) return;
+    
+    modalMensaje.innerText = mensaje;
+    accionAlCerrarModal = callback; // Guardamos la función que deba ejecutarse al cerrar
+    customModal.classList.add('activo'); // Muestra la ventana y aplica el blur
+}
+
+// Evento para cerrar la ventana al pulsar el botón OK
+modalBtnCerrar.addEventListener('click', () => {
+    customModal.classList.remove('activo'); // Oculta la ventana
+    
+    // Si había una acción pendiente (ej. cambiar de pantalla), la ejecutamos ahora
+    if (accionAlCerrarModal) {
+        accionAlCerrarModal();
+        accionAlCerrarModal = null; // Limpiamos la acción
+    }
+});
+
 function cambiarEscena(escenaDestino) {
     escenaBienvenida.classList.remove('activa');
     escenaOpciones.classList.remove('activa');
@@ -58,7 +82,9 @@ function cambiarEscena(escenaDestino) {
 }
 
 btnContinuar.addEventListener('click', () => cambiarEscena(escenaOpciones));
-btnFeedback.addEventListener('click', () => alert('¡Gracias por jugar! Envía tus comentarios a dev@tujuego.com'));
+btnFeedback.addEventListener('click', () => {
+    mostrarAlertaPersonalizada('Gràcies per jugar! Envía els teus comentaris a cucadrinas@gmail.com');
+});
 btnVolverOpciones.addEventListener('click', () => cambiarEscena(escenaBienvenida));
 
 btnSalir.addEventListener('click', () => {
@@ -184,8 +210,12 @@ function finDelJuego() {
     const mm = String(minutos).padStart(2, '0');
     const ss = String(segundos).padStart(2, '0');
     
-    alert(`FI DE LA PARTIDA. Has aconseguit un total de ${captures} captures en un temps de ${mm}:${ss}.`);
-    cambiarEscena(escenaBienvenida);
+    const mensajeFinal = `FI DE LA PARTIDA. Has aconseguit un total de ${captures} captures en un temps de ${mm}:${ss}.`;
+    
+    // Mostramos el modal y pasamos el cambio de escena como la acción a ejecutar al cerrar
+    mostrarAlertaPersonalizada(mensajeFinal, () => {
+        cambiarEscena(escenaBienvenida);
+    });
 }
 
 function dibujar() {

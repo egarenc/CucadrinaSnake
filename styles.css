@@ -263,3 +263,68 @@ input:checked + .slider::after {
     background: #45a049;
     transform: scale(1.15);
 }
+
+/* ==========================================
+   VENTANA EMERGENTE PERSONALIZADA (MODAL)
+   ========================================== */
+
+/* Capa oscura de fondo que cubre toda la pantalla */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6); /* Fondo semitransparente oscuro */
+    backdrop-filter: blur(8px);           /* El truco mágico para el efecto desenfoque */
+    -webkit-backdrop-filter: blur(8px);   /* Compatibilidad con Safari */
+    display: none;                         /* Oculto por defecto */
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;                        /* Asegura que se dibuje por encima de todo */
+}
+
+/* Se activa dinámicamente con JavaScript */
+.modal-overlay.activo {
+    display: flex;
+}
+
+/* La pequeña ventana flotante */
+.modal-content {
+    background-color: #2a2a2a;
+    border: 2px solid #4CAF50;            /* Borde verde a juego */
+    border-radius: 12px;
+    padding: 30px;
+    max-width: 400px;
+    width: 85%;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.8);
+    text-align: center;
+    animation: aparecerModal 0.3s ease-out; /* Animación suave de entrada */
+}
+
+#modal-mensaje {
+    font-size: 18px;
+    line-height: 1.5;
+    margin-bottom: 25px;
+    color: #f0f0f0;
+}
+
+/* Botón de aceptación del modal */
+#modal-btn-cerrar {
+    width: auto;
+    min-width: 120px;
+    margin: 0 auto;
+    padding: 10px 20px;
+}
+
+/* Animación de escala para que la ventana brote del centro */
+@keyframes aparecerModal {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
