@@ -203,7 +203,7 @@ function prepararPartida() {
     }, 1000);
     
     const dureza = parseInt(sliderDureza.value);
-    const velocidadMs = 200 - (dureza * 15); 
+    const velocidadMs = 300 - (dureza * 15); 
     
     bucleJuego = setInterval(actualizarJuego, velocidadMs);
 }
