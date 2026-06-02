@@ -40,6 +40,10 @@ const ctx = canvas.getContext('2d');
 const customModal = document.getElementById('custom-modal');
 const modalMensaje = document.getElementById('modal-mensaje');
 const modalBtnCerrar = document.getElementById('modal-btn-cerrar');
+const modalRankingForm = document.getElementById('modal-ranking-form');
+const modalIniciales = document.getElementById('modal-iniciales');
+const modalBtnEnviar = document.getElementById('modal-btn-enviar');
+const btnRanking = document.getElementById('btn-ranking');
 let accionAlCerrarModal = null; 
 
 // ==========================================
@@ -68,6 +72,7 @@ function mostrarAlertaPersonalizada(mensaje, callback = null) {
 
 modalBtnCerrar.addEventListener('click', () => {
     customModal.classList.remove('activo'); 
+    if (modalRankingForm) modalRankingForm.style.display = 'none'; // Asegura ocultarlo al cerrar
     if (accionAlCerrarModal) {
         accionAlCerrarModal();
         accionAlCerrarModal = null; 
@@ -85,6 +90,75 @@ btnContinuar.addEventListener('click', () => cambiarEscena(escenaOpciones));
 btnFeedback.addEventListener('click', () => {
     mostrarAlertaPersonalizada('Gràcies per jugar! Envía els teus comentaris a cucadrinas@gmail.com');
 });
+
+// Listener para consultar el Ranking en game.js
+btnRanking.addEventListener('click', () => {
+    mostrarAlertaPersonalizada('Cargant rànquing...');
+    
+    // Cambiamos temporalmente el botón de OK a "Esperando"
+    modalBtnCerrar.disabled = true;
+    modalBtnCerrar.innerText = "Espera...";
+
+    const urlAPI = 'https://script.google.com/macros/s/AKfycbwbtyD0_pFAITj6cqS7VmcdLwvjMAHSbPT4t43LiGKrzvuC5jfVoJ4TD_X_X4gtQPWT/exec?action=getRankings';
+
+    fetch(urlAPI)
+    .then(response => response.json())
+    .then(datos => {
+        modalBtnCerrar.disabled = false;
+        modalBtnCerrar.innerText = "OK";
+
+        if (!datos || datos.length === 0) {
+            modalMensaje.innerText = "Encara no hi ha puntuacions registrades.";
+            return;
+        }
+
+        // 1. ORDENACIÓN PERSONALIZADA EN FRONTEND:
+        // Primero por segundosTranscurridos (Mayor a Menor -> b - a)
+        // Si empatan, por dificultad (Mayor a Menor -> b - a)
+        datos.sort((a, b) => {
+            if (b.segundosTranscurridos !== a.segundosTranscurridos) {
+                return b.segundosTranscurridos - a.segundosTranscurridos;
+            }
+            return b.dificultad - a.dificultad;
+        });
+
+        // 2. CONSTRUIR TABLA HTML PARA EL MODAL
+        let tablaHTML = `<b style="color:#4CAF50; font-size:18px;">🏆 TOP RANKING 🏆</b><br><br>`;
+        tablaHTML += `<table style="width:100%; border-collapse: collapse; text-align:center; font-size:14px;">
+                        <tr style="border-bottom: 2px solid #4CAF50; color:#4CAF50;">
+                            <th>Pos</th>
+                            <th>Jugador</th>
+                            <th>Temps</th>
+                            <th>Dif</th>
+                        </tr>`;
+        
+        // Mostramos el Top 10 para no saturar el modal
+        const topMax = Math.min(datos.length, 10);
+        for (let i = 0; i < topMax; i++) {
+            const minutos = Math.floor(datos[i].segundosTranscurridos / 60);
+            const segundos = datos[i].segundosTranscurridos % 60;
+            const tiempoFormateado = `${String(minutos).padStart(2, '0')}:${String(segundos).padStart(2, '0')}`;
+            
+            tablaHTML += `<tr style="border-bottom: 1px solid #444; height:30px;">
+                            <td>${i + 1}</td>
+                            <td style="font-weight:bold;">${datos[i].iniciales}</td>
+                            <td>${tiempoFormateado}</td>
+                            <td>⭐${datos[i].dificultad}</td>
+                          </tr>`;
+        }
+        tablaHTML += `</table>`;
+
+        // Inyectamos la tabla en el cuerpo del modal
+        modalMensaje.innerHTML = tablaHTML;
+    })
+    .catch(error => {
+        console.error("Error cargando el ranking:", error);
+        modalBtnCerrar.disabled = false;
+        modalBtnCerrar.innerText = "OK";
+        modalMensaje.innerText = "Error en connectar amb el servidor de rànquing.";
+    });
+});
+
 btnVolverOpciones.addEventListener('click', () => cambiarEscena(escenaBienvenida));
 
 btnSalir.addEventListener('click', () => {
@@ -212,9 +286,67 @@ function finDelJuego() {
     
     const mensajeFinal = `FI DE LA PARTIDA. Has aconseguit un total de ${captures} captures en un temps de ${mm}:${ss}.`;
     
+    // 1. Mostramos el modal común
     mostrarAlertaPersonalizada(mensajeFinal, () => {
         cambiarEscena(escenaBienvenida);
     });
+
+    // 2. Hacemos visible el bloque del ranking e inicializamos el input vacío
+    if (modalRankingForm && modalIniciales && modalBtnEnviar) {
+        modalRankingForm.style.display = 'block';
+        modalIniciales.value = '';
+        modalBtnEnviar.disabled = false;
+        modalBtnEnviar.innerText = "ENVIAR RANKING";
+
+        // 3. Eliminamos listeners antiguos clonando el botón (evita duplicados de partidas anteriores)
+        const nuevoBtnEnviar = modalBtnEnviar.cloneNode(true);
+        modalBtnEnviar.parentNode.replaceChild(nuevoBtnEnviar, modalBtnEnviar);
+
+        // 4. Programamos el evento de envío
+        nuevoBtnEnviar.addEventListener('click', () => {
+            const iniciales = modalIniciales.value.trim().toUpperCase();
+            
+            if (iniciales === '') {
+                alert('Por si de cas, introdueix unes inicials vàlides.');
+                return;
+            }
+
+            nuevoBtnEnviar.disabled = true;
+            nuevoBtnEnviar.innerText = "Enviant...";
+
+            // Estructura de datos solicitada
+            const datosRanking = {
+                timestamp: Date.now(), // Hora actual en milisegundos
+                iniciales: iniciales,
+                segundosTranscurridos: segundosTranscurridos,
+                dificultad: parseInt(sliderDureza.value)
+            };
+
+            const urlAPI = 'https://script.google.com/macros/s/AKfycbxAlIJ5a_jWJCKiHCYbEQX8BM9WA3DCWXIHAKs6NCKy8ExbVBlmFNUPAVIOvzYmJuXd/exec';
+
+            // Petición HTTP POST a Google Apps Script
+            fetch(urlAPI, {
+                method: 'POST',
+                mode: 'no-cors', // Necesario para evitar bloqueos CORS con Google Scripts
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(datosRanking)
+            })
+            .then(() => {
+                nuevoBtnEnviar.innerText = "¡ENVIAT!";
+                setTimeout(() => {
+                    // Cerramos el modal simulando el click en OK tras un envío exitoso
+                    modalBtnCerrar.click();
+                }, 1200);
+            })
+            .catch(error => {
+                console.error("Error enviando al ranking:", error);
+                nuevoBtnEnviar.disabled = false;
+                nuevoBtnEnviar.innerText = "ERROR (Reintentar)";
+            });
+        });
+    }
 }
 
 function dibujar() {

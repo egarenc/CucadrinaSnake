@@ -11,6 +11,7 @@
     <div id="pantalla-bienvenida" class="escena activa">
         <h1>🐍 CucaSnake Joc Web 🐲</h1>
         <button id="btn-continuar">CONTINUAR</button>
+        <button id="btn-ranking" style="background-color: #2196F3;">RANKING</button>
         <button id="btn-feedback" class="btn-neutral">FEEDBACK</button>
         <div class="contenedor-mascara-cabeza">
         <img src="cabeza.jpg" alt="Cucadrinas" class="imagen-cabeza-menu">
@@ -56,11 +57,19 @@
     </div>
 
     <div id="custom-modal" class="modal-overlay">
-        <div class="modal-content">
-            <p id="modal-mensaje">Missatge de prova</p>
-            <button id="modal-btn-cerrar">OK</button>
+    <div class="modal-content">
+        <p id="modal-mensaje">Missatge de prova</p>
+        
+        <div id="modal-ranking-form" style="display: none; margin-bottom: 20px;">
+            <label for="modal-iniciales" style="display:block; margin-bottom:8px; font-size:14px; color:#4CAF50;">INTRODUEIX LES TEVES INICIALS (MÀX. 6):</label>
+            <input type="text" id="modal-iniciales" maxlength="6" style="text-transform: uppercase; padding: 8px; text-align: center; font-size: 16px; border-radius: 4px; border: 1px solid #4CAF50; background: #1a1a1a; color: white; width: 80%; max-width: 200px; margin-bottom: 10px;">
+            <button id="modal-btn-enviar" style="width: auto; min-width: 120px; background-color: #4CAF50; padding: 10px 20px; margin: 5px auto; display: block;">ENVIAR RANKING</button>
         </div>
+
+        <button id="modal-btn-cerrar">OK</button>
     </div>
+    </div>
+    
 
     <script src="game.js"></script>
 </body>
