@@ -45,7 +45,7 @@ let accionAlCerrarModal = null;
 // ==========================================
 // 3. VARIABLES DE ESTADO DEL JUEGO
 // ==========================================
-const tamanoCuadricula = 20; 
+const tamanoCuadricula = 40; 
 let serpiente = [];
 let comida = {};
 let dx = 0; 
