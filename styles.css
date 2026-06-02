@@ -268,21 +268,30 @@ input:checked + .slider::after { transform: translateX(92px); }
 }
 
 /* ==========================================
-   MÁSCARA CIRCULAR PARA LA CABEZA EN EL MENÚ
+   MÁSCARA CIRCULAR PARA LA CABEZA EN EL MENÚ (BLINDADO MÓVIL)
    ========================================== */
 .contenedor-mascara-cabeza {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 25px; /* Separación respecto al botón superior */
+    margin-top: 25px; /* Separación respecto al botón */
     width: 100%;
 }
 
 .imagen-cabeza-menu {
-    width: 100px;               /* Tamaño de la imagen en pantalla */
-    height: 100px;              /* Mantener proporción 1:1 para el círculo */
-    object-fit: cover;          /* Evita que la imagen se deforme al recortarse */
-    border-radius: 50%;         /* El truco clásico para hacer el círculo */
-    border: 3px solid #4CAF50;  /* Borde verde neón a juego con el estilo del juego */
-    box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3); /* Pequeño brillo verde texturizado */
+    width: 100px;
+    height: 100px;
+    object-fit: cover; /* Evita que la imagen se deforme */
+    
+    /* 🔴 SOLUCIÓN MÓVIL: Forzamos el comportamiento circular y cortamos el sobrante */
+    border-radius: 50%;
+    -webkit-border-radius: 50%; /* Compatibilidad con navegadores iOS/Safari antiguos */
+    overflow: hidden;           /* Corta de forma estricta lo que se salga del círculo */
+    
+    border: 3px solid #4CAF50;  /* Borde verde */
+    box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+    
+    /* Forzar hardware-acceleration en móviles para que aplique el clip correctamente */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
 }
