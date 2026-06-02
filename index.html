@@ -9,35 +9,35 @@
 <body>
 
     <div id="pantalla-bienvenida" class="escena activa">
-        <h1>🐍 CucadrinasSnake Web Game</h1>
+        <h1>🐍 CucaSnake Joc Web</h1>
         <button id="btn-continuar">CONTINUAR</button>
-        <button id="btn-feedback">FEEDBACK</button>
+        <button id="btn-feedback" class="btn-neutral">FEEDBACK</button>
     </div>
 
     <div id="pantalla-opciones" class="escena">
-        <h2>CONFIGURACIÓ DE PARTIDA</h2>
+        <h2>Configuració</h2>
         
         <div class="control-group">
-            <label for="toggle-sonido">SO:</label>
-            <select id="toggle-sonido">
-                <option value="activo">ACTIU</option>
-                <option value="mute">DESACTIVAT</option>
-            </select>
+            <label>🔊 SO</label>
+            <label class="switch">
+            <input type="checkbox" id="toggle-sonido" checked>
+            <span class="slider"></span>
+            </label>
         </div>
         
         <div class="control-group">
-            <label for="slider-dureza">DIFICULTAT:</label>
+            <label for="slider-dureza">🐱‍👤 DIFICULTAT</label>
             <input type="range" id="slider-dureza" min="1" max="10" value="5">
         </div>
         
         <button id="btn-iniciar">INICIAR PARTIDA</button>
-        <button id="btn-volver-opciones">TORNAR</button>
+        <button id="btn-volver-opciones" class="btn-neutral">TORNAR</button>
     </div>
 
     <div id="pantalla-juego" class="escena">
         <div id="marcador">
-            <span>Nivell: <span id="ui-nivel">1</span>/10</span>
-            <span>Puntuació: <span id="ui-puntos">0</span></span>
+            <span>Captures: <span id="ui-captures">0</span></span>
+            <span>Temps: <span id="ui-tiempo">00:00</span></span>
         </div>
         
         <canvas id="game-canvas" width="600" height="600"></canvas>

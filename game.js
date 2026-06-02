@@ -29,26 +29,23 @@ const btnSalir = document.getElementById('btn-salir');
 
 const sliderDureza = document.getElementById('slider-dureza');
 const toggleSonido = document.getElementById('toggle-sonido');
-const uiNivel = document.getElementById('ui-nivel');
-const uiPuntos = document.getElementById('ui-puntos');
+const uiCaptures = document.getElementById('ui-captures');
+const uiTiempo = document.getElementById('ui-tiempo'); // Nueva referencia para el tiempo
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
 
 // ==========================================
 // 3. VARIABLES DE ESTADO DEL JUEGO
 // ==========================================
-const tamanoCuadricula = 20; // 20x20 píxeles por bloque
+const tamanoCuadricula = 20; 
 let serpiente = [];
 let comida = {};
-let dx = 0; // Dirección X
-let dy = 0; // Dirección Y
-let nivelActual = 1;
-let puntos = 0;
-let piezasComidasNivel = 0;
+let dx = 0; 
+let dy = 0; 
+let captures = 0;
+let segundosTranscurridos = 0; // Contador de segundos
 let bucleJuego;
-
-const PIEZAS_PARA_SUBIR_NIVEL = 5; // Cuántas piezas comer para pasar de nivel
-const NIVEL_MAXIMO = 10;
+let bucleCronometro;          // Intervalo del reloj
 
 // ==========================================
 // 4. NAVEGACIÓN ENTRE ESCENAS
@@ -78,27 +75,32 @@ btnIniciar.addEventListener('click', () => {
 // 5. LÓGICA PRINCIPAL DEL JUEGO
 // ==========================================
 function iniciarPartidaGlobal() {
-    nivelActual = 1;
-    puntos = 0;
-    prepararNivel();
+    captures = 0;
+    prepararPartida();
 }
 
-function prepararNivel() {
-    // Resetear serpiente: SOLO la cabeza, centrada
+function prepararPartida() {
     serpiente = [{ x: canvas.width / 2, y: canvas.height / 2 }];
-    dx = tamanoCuadricula; // Arranca moviéndose a la derecha
+    dx = tamanoCuadricula; 
     dy = 0;
-    piezasComidasNivel = 0;
     
-    uiNivel.innerText = nivelActual;
-    uiPuntos.innerText = puntos;
+    if (uiCaptures) uiCaptures.innerText = captures;
     
     generarComida();
     
+    // Limpiar bucles previos por seguridad
     if (bucleJuego) clearInterval(bucleJuego);
+    if (bucleCronometro) clearInterval(bucleCronometro);
     
-    // Calcular velocidad basada en la dureza (de 1 a 10)
-    // A mayor dureza, menor es el intervalo (más rápido va)
+    // Inicializar y arrancar el cronómetro de partida
+    segundosTranscurridos = 0;
+    actualizarInterfazTiempo();
+    bucleCronometro = setInterval(() => {
+        segundosTranscurridos++;
+        actualizarInterfazTiempo();
+    }, 1000);
+    
+    // Configurar velocidad de la serpiente
     const dureza = parseInt(sliderDureza.value);
     const velocidadMs = 200 - (dureza * 15); 
     
@@ -107,6 +109,20 @@ function prepararNivel() {
 
 function detenerJuego() {
     if (bucleJuego) clearInterval(bucleJuego);
+    if (bucleCronometro) clearInterval(bucleCronometro);
+}
+
+function actualizarInterfazTiempo() {
+    if (!uiTiempo) return;
+    
+    const minutos = Math.floor(segundosTranscurridos / 60);
+    const segundos = segundosTranscurridos % 60;
+    
+    // Dar formato MM:SS rellenando con un cero a la izquierda si es necesario
+    const mm = String(minutos).padStart(2, '0');
+    const ss = String(segundos).padStart(2, '0');
+    
+    uiTiempo.innerText = `${mm}:${ss}`;
 }
 
 function generarComida() {
@@ -115,7 +131,6 @@ function generarComida() {
         y: Math.floor(Math.random() * (canvas.height / tamanoCuadricula)) * tamanoCuadricula
     };
     
-    // Evitar que la comida aparezca sobre el cuerpo de la serpiente
     serpiente.forEach(segmento => {
         if (segmento.x === comida.x && segmento.y === comida.y) {
             generarComida();
@@ -124,78 +139,57 @@ function generarComida() {
 }
 
 function reproducirSonido() {
-    if (toggleSonido.value === 'activo') {
-        // Simulación de sonido de comer
+    if (toggleSonido && toggleSonido.checked) {
         console.log("¡Ñam!"); 
     }
 }
 
 function actualizarJuego() {
-    // 1. Calcular nueva posición de la cabeza
     const nuevaCabeza = { 
         x: serpiente[0].x + dx, 
         y: serpiente[0].y + dy 
     };
 
-    // 2. Comprobar colisión con paredes
     if (nuevaCabeza.x < 0 || nuevaCabeza.x >= canvas.width || 
         nuevaCabeza.y < 0 || nuevaCabeza.y >= canvas.height) {
         return finDelJuego();
     }
 
-    // 3. Comprobar colisión consigo misma
     for (let i = 0; i < serpiente.length; i++) {
         if (nuevaCabeza.x === serpiente[i].x && nuevaCabeza.y === serpiente[i].y) {
             return finDelJuego();
         }
     }
 
-    // 4. Mover la serpiente (añadir nueva cabeza)
     serpiente.unshift(nuevaCabeza);
 
-    // 5. Comprobar si ha comido
     if (nuevaCabeza.x === comida.x && nuevaCabeza.y === comida.y) {
-        puntos += 10 * nivelActual; // Más puntos a niveles más altos
-        piezasComidasNivel++;
-        uiPuntos.innerText = puntos;
+        captures++;
+        if (uiCaptures) uiCaptures.innerText = captures;
         reproducirSonido();
-
-        // Subida de nivel
-        if (piezasComidasNivel >= PIEZAS_PARA_SUBIR_NIVEL) {
-            nivelActual++;
-            if (nivelActual > NIVEL_MAXIMO) {
-                detenerJuego();
-                alert(`¡HAS GANADO! Has superado los 10 niveles con ${puntos} puntos.`);
-                cambiarEscena(escenaBienvenida);
-                return;
-            } else {
-                // Prepara el siguiente nivel (resetea el tamaño de la serpiente a 1)
-                prepararNivel();
-                return; 
-            }
-        } else {
-            generarComida(); // Generar otra pieza en el mismo nivel
-        }
+        generarComida();
     } else {
-        // Si no come, eliminamos la cola para que no crezca infinitamente
         serpiente.pop(); 
     }
 
-    // 6. Dibujar el fotograma
     dibujar();
 }
 
 function finDelJuego() {
     detenerJuego();
-    alert(`FIN DE LA PARTIDA. Llegaste al nivel ${nivelActual} con ${puntos} puntos.`);
+    
+    // Obtener el tiempo final para mostrarlo en el mensaje
+    const minutos = Math.floor(segundosTranscurridos / 60);
+    const segundos = segundosTranscurridos % 60;
+    const mm = String(minutos).padStart(2, '0');
+    const ss = String(segundos).padStart(2, '0');
+    
+    alert(`FI DE LA PARTIDA. Has aconseguit un total de ${captures} captures en un temps de ${mm}:${ss}.`);
     cambiarEscena(escenaBienvenida);
 }
 
 function dibujar() {
-    // Limpiar pantalla
-    //ctx.fillStyle = '#000';
-    //ctx.fillRect(0, 0, canvas.width, canvas.height);
-    // Dibujar fondo (Imagen o fallback negro si no carga)
+    // 1. Dibujar el fondo espacial
     if (imgFondo.complete && imgFondo.naturalWidth !== 0) {
         ctx.drawImage(imgFondo, 0, 0, canvas.width, canvas.height);
     } else {
@@ -203,37 +197,76 @@ function dibujar() {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
-    // Dibujar comida (roja)
-    ctx.fillStyle = '#ff3333';
-    ctx.fillRect(comida.x, comida.y, tamanoCuadricula, tamanoCuadricula);
+    // 2. Dibujar la comida (Fondo amarillo con un emoticono encima)
+    const centroComidaX = comida.x + tamanoCuadricula / 2;
+    const centroComidaY = comida.y + tamanoCuadricula / 2;
 
-    // Dibujar serpiente
-    serpiente.forEach((segmento, index) => {
-        if (index === 0) {
-            // CABEZA
+    // Pintamos la base circular en color amarillo
+    ctx.fillStyle = '#FFD700'; // Amarillo oro (puedes usar '#FFFF00' si lo quieres más brillante)
+    ctx.beginPath();
+    ctx.arc(centroComidaX, centroComidaY, tamanoCuadricula / 2, 0, 2 * Math.PI);
+    ctx.fill();
+
+    // Configuración para pintar el emoticono perfectamente centrado
+    ctx.font = `${tamanoCuadricula * 0.6}px Arial`; // Tamaño del emoji un poco menor que la cuadrícula
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    // Aquí eliges el emoticono de tu galería/teclado. Ejemplos: '😎', '🍕', '🪙', '🐛', '⭐'
+    const emoticonoElegido = '🚧'; 
+    
+    // Dibujamos el emoji justo en el centro del círculo amarillo
+    ctx.fillText(emoticonoElegido, centroComidaX, centroComidaY);
+
+    // ==========================================================
+    // CONFIGURACIÓN DE SUPERPOSICIÓN
+    // ==========================================================
+    const superposicion = 6; // Píxeles extra que se expande cada pieza para solaparse
+    const radio = (tamanoCuadricula + superposicion) / 2;
+
+    // 3. Dibujar la serpiente al revés (de cola a cabeza) para gestionar las capas
+    for (let i = serpiente.length - 1; i >= 0; i--) {
+        const segmento = serpiente[i];
+        
+        // Encontramos el centro exacto de la celda actual
+        const centroX = segmento.x + tamanoCuadricula / 2;
+        const centroY = segmento.y + tamanoCuadricula / 2;
+
+        ctx.save(); // Guardamos el estado limpio del lienzo
+
+        // 4. Crear máscara circular completa centrado en la pieza
+        ctx.beginPath();
+        ctx.arc(centroX, centroY, radio, 0, 2 * Math.PI);
+        ctx.closePath();
+        ctx.clip(); // Aplicamos el recorte esférico
+
+        // 5. Dibujar la imagen expandida dentro de la máscara circular
+        if (i === 0) {
+            // CABEZA (Tu dragón de Cucadrinas quedará arriba de todo)
             if (imgCabeza.complete && imgCabeza.naturalWidth !== 0) {
-                ctx.drawImage(imgCabeza, segmento.x, segmento.y, tamanoCuadricula, tamanoCuadricula);
+                ctx.drawImage(imgCabeza, centroX - radio, centroY - radio, radio * 2, radio * 2);
             } else {
-                ctx.fillStyle = '#4CAF50'; // Fallback si no carga imagen
-                ctx.fillRect(segmento.x, segmento.y, tamanoCuadricula, tamanoCuadricula);
+                ctx.fillStyle = '#4CAF50'; 
+                ctx.fillRect(centroX - radio, centroY - radio, radio * 2, radio * 2);
             }
         } else {
-            // CUERPO
+            // CUERPO (Las escamas se superpondrán elegantemente)
             if (imgCuerpo.complete && imgCuerpo.naturalWidth !== 0) {
-                ctx.drawImage(imgCuerpo, segmento.x, segmento.y, tamanoCuadricula, tamanoCuadricula);
+                ctx.drawImage(imgCuerpo, centroX - radio, centroY - radio, radio * 2, radio * 2);
             } else {
-                ctx.fillStyle = '#81C784'; // Fallback si no carga imagen
-                ctx.fillRect(segmento.x, segmento.y, tamanoCuadricula, tamanoCuadricula);
+                ctx.fillStyle = '#81C784'; 
+                ctx.fillRect(centroX - radio, centroY - radio, radio * 2, radio * 2);
             }
         }
-    });
+
+        ctx.restore(); // Restauramos el lienzo para el siguiente segmento
+    }
 }
 
 // ==========================================
 // 6. CONTROLES DEL TECLADO (Flechas o WASD)
 // ==========================================
 window.addEventListener('keydown', e => {
-    // Evita que la serpiente se dé la vuelta sobre sí misma
     switch (e.key) {
         case 'ArrowUp':
         case 'w':
