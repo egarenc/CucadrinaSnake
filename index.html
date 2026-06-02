@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="ca">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +9,7 @@
 <body>
 
     <div id="pantalla-bienvenida" class="escena activa">
-        <h1>🐍 CucaSnake Joc Web 🐉</h1>
+        <h1>🐍 CucaSnake Joc Web 🐲</h1>
         <button id="btn-continuar">CONTINUAR</button>
         <button id="btn-feedback" class="btn-neutral">FEEDBACK</button>
     </div>
@@ -20,13 +20,13 @@
         <div class="control-group">
             <label>🔊 SO</label>
             <label class="switch">
-            <input type="checkbox" id="toggle-sonido" checked>
-            <span class="slider"></span>
+                <input type="checkbox" id="toggle-sonido" checked>
+                <span class="slider"></span>
             </label>
         </div>
         
         <div class="control-group">
-            <label for="slider-dureza">🐱‍👤 DIFICULTAT</label>
+            <label for="slider-dureza">🚩DIFICULTAT</label>
             <input type="range" id="slider-dureza" min="1" max="10" value="5">
         </div>
         
@@ -41,15 +41,24 @@
         </div>
         
         <canvas id="game-canvas" width="600" height="600"></canvas>
+
+        <div class="dpad-contenedor">
+            <button id="dpad-arriba" class="btn-dpad">▲</button>
+            <button id="dpad-izq" class="btn-dpad">◀</button>
+            <button id="dpad-der" class="btn-dpad">▶</button>
+            <button id="dpad-abajo" class="btn-dpad">▼</button>
+        </div>
         
         <button id="btn-salir" class="btn-peligro">SORTIR</button>
     </div>
+
     <div id="custom-modal" class="modal-overlay">
         <div class="modal-content">
             <p id="modal-mensaje">Missatge de prova</p>
             <button id="modal-btn-cerrar">OK</button>
         </div>
     </div>
+
     <script src="game.js"></script>
 </body>
 </html>
