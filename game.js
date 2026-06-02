@@ -14,6 +14,10 @@ imgCuerpo.src = RUTA_CUERPO;
 const imgFondo = new Image();
 imgFondo.src = RUTA_FONDO;
 
+const sonidoBoton = new Audio('sound_button.mp3');
+const sonidoPartida = new Audio('estapera.mp3');
+sonidoPartida.loop = true; // Hace que la música no se corte si la partida es larga
+
 // ==========================================
 // 2. REFERENCIAS AL DOM
 // ==========================================
@@ -117,7 +121,11 @@ function prepararPartida() {
     // Limpiar bucles previos por seguridad
     if (bucleJuego) clearInterval(bucleJuego);
     if (bucleCronometro) clearInterval(bucleCronometro);
-    
+    if (toggleSonido && toggleSonido.checked) {
+        sonidoPartida.currentTime = 0; // Reinicia la canción al segundo 0
+        sonidoPartida.play().catch(e => console.log("Audio de fondo bloqueado:", e));
+    }
+
     // Inicializar y arrancar el cronómetro de partida
     segundosTranscurridos = 0;
     actualizarInterfazTiempo();
@@ -136,6 +144,7 @@ function prepararPartida() {
 function detenerJuego() {
     if (bucleJuego) clearInterval(bucleJuego);
     if (bucleCronometro) clearInterval(bucleCronometro);
+    sonidoPartida.pause();
 }
 
 function actualizarInterfazTiempo() {
@@ -320,3 +329,33 @@ window.addEventListener('keydown', e => {
             break;
     }
 });
+
+// ==========================================
+// 7. GESTIÓN AUTOMÁTICA DE SONIDO EN BOTONES
+// ==========================================
+function reproducirSonidoBoton() {
+    // Comprobamos si el elemento existe y si el checkbox está marcado (checked)
+    if (toggleSonido && toggleSonido.checked) {
+        sonidoBoton.currentTime = 0; // Reinicia el puntero para permitir clics rápidos seguidos
+        sonidoBoton.play().catch(e => console.log("Audio bloqueado por el navegador hasta la primera interacción:", e));
+    }
+}
+
+// Buscamos todos los botones del DOM y les asignamos la función de sonido al hacer click
+document.querySelectorAll('button').forEach(boton => {
+    boton.addEventListener('click', reproducirSonidoBoton);
+});
+
+// Controlar si el usuario cambia el interruptor de sonido en medio de una partida
+if (toggleSonido) {
+    toggleSonido.addEventListener('change', () => {
+        // Si bucleJuego no es null, significa que hay una partida activa actualmente
+        if (bucleJuego) {
+            if (toggleSonido.checked) {
+                sonidoPartida.play().catch(e => console.log(e));
+            } else {
+                sonidoPartida.pause();
+            }
+        }
+    });
+}
